@@ -10,18 +10,18 @@ class FoodSpider(scrapy.Spider):
     #采集10个分类
     def start_requests(self):
         urls = {
-            "饮料冲调":"https://list.jd.com/list.html?cat=1320,1585",
-            "茗茶":"https://list.jd.com/list.html?cat=1320,12202",
-            "品牌礼券":"https://list.jd.com/list.html?cat=1320,2641",
-            "地方特产":"https://list.jd.com/list.html?cat=1320,1581",
+            #"饮料冲调":"https://list.jd.com/list.html?cat=1320,1585",
+            #"茗茶":"https://list.jd.com/list.html?cat=1320,12202",
+            #"品牌礼券":"https://list.jd.com/list.html?cat=1320,2641",
+            #"地方特产":"https://list.jd.com/list.html?cat=1320,1581",
             "进口食品":"https://list.jd.com/list.html?cat=1320,5019",
-            "粮油调味":"https://list.jd.com/list.html?cat=1320,1584",
-            "休闲食品":"https://list.jd.com/list.html?cat=1320,1583",
-            "中外名酒":"https://list.jd.com/list.html?cat=12259,12260",
-            "新鲜水果":"https://list.jd.com/list.html?cat=12218,12221",
-            "海鲜水产":"https://list.jd.com/list.html?cat=12218,12222",
-            "冷饮冻食":"https://list.jd.com/list.html?cat=12218,13581",
-            "精选肉类":"https://list.jd.com/list.html?cat=12218,13591",
+            #"粮油调味":"https://list.jd.com/list.html?cat=1320,1584",
+            #"休闲食品":"https://list.jd.com/list.html?cat=1320,1583",
+            #"中外名酒":"https://list.jd.com/list.html?cat=12259,12260",
+            #"新鲜水果":"https://list.jd.com/list.html?cat=12218,12221",
+            #"海鲜水产":"https://list.jd.com/list.html?cat=12218,12222",
+            #"冷饮冻食":"https://list.jd.com/list.html?cat=12218,13581",
+            #"精选肉类":"https://list.jd.com/list.html?cat=12218,13591",
         }
 
         for name,url in urls.items():
@@ -46,17 +46,26 @@ class FoodSpider(scrapy.Spider):
     def dealsku(self,item):
         key = item.xpath(".//div[@class='sl-key']/span/text()").extract()[0].strip()
         val = item.xpath(".//ul[contains(@class,'J_valueList')]/li")
+
         sku = []
 
         for each in val:
             img = each.xpath(".//img")
             name = each.xpath("./a/text()").extract()[0].strip()
+            url = each.xpath("./a/@href").extract()[0].strip()
 
             if len(img):
                 src = img.xpath('@src').extract()[0].strip()
                 json = {"name":name,"src":src}
                 sku.append(json)
             else:
-                sku.append(name)        
+                sku.append(name)
+
+            #采集二级分类的sku
+            data = yield scrapy.Request(url=url,callback=self.second,meta={"name":name})                   
 
         return {key:sku}
+
+    #二级分类的sku
+    def second(self, response):
+        
