@@ -93,8 +93,6 @@ ITEM_PIPELINES = {
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
 #mongo配置
-MONGODB_HOST = '120.78.162.66'
+MONGODB_HOST = '127.0.0.1'
 MONGODB_PORT = 7788
 MONGODB_DBNAME = 'goods'
-MONGODB_USER = 'hanyu'
-MONGODB_PWD = '123456'
