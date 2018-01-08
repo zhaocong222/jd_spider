@@ -67,9 +67,9 @@ DEFAULT_REQUEST_HEADERS = {
 
 # Configure item pipelines
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
-#ITEM_PIPELINES = {
-#    'jd_spider.pipelines.JdSpiderPipeline': 300,
-#}
+ITEM_PIPELINES = {
+    'jd_spider.pipelines.JdSpiderPipeline': 300,
+}
 
 # Enable and configure the AutoThrottle extension (disabled by default)
 # See https://doc.scrapy.org/en/latest/topics/autothrottle.html
@@ -91,3 +91,10 @@ DEFAULT_REQUEST_HEADERS = {
 #HTTPCACHE_DIR = 'httpcache'
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
+
+#mongo配置
+MONGODB_HOST = '120.78.162.66'
+MONGODB_PORT = 7788
+MONGODB_DBNAME = 'goods'
+MONGODB_USER = 'hanyu'
+MONGODB_PWD = '123456'

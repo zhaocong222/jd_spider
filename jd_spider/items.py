@@ -11,4 +11,5 @@ import scrapy
 class JdSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
-    pass
+    sku = scrapy.Field() #sku详情
+    top = scrapy.Field() #顶级分类
