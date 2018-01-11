@@ -12,4 +12,6 @@ class JdSpiderItem(scrapy.Item):
     # define the fields for your item here like:
     # name = scrapy.Field()
     sku = scrapy.Field() #sku详情
-    top = scrapy.Field() #顶级分类
+    top = scrapy.Field() #分类
+    parent = scrapy.Field() #父级分类
+    url = scrapy.Field()
