@@ -1,5 +1,6 @@
 import pymongo
 import configparser
+import json
 
 class dealSpider(object):
 
@@ -11,7 +12,6 @@ class dealSpider(object):
         #连接mongo
         self.dbInit()
        
-
     def initConfig(self,file):
         conf = configparser.ConfigParser()
         conf.read(file)
@@ -39,29 +39,42 @@ class dealSpider(object):
         self.collection = self.db[collection]
 
     #无线级分类
-    def generateTree(self,key):
+    def generateTree(self,key,level):
         data = []
-        res = self.findData({"parent":key})
-        for each in res:
+        level += 1
+
+        for each in self.findData({"parent":key}):
             res1 = {"name":each["top"]}
-            res1["children"] = self.generateTree(res1["name"])
-            
+            if each["top"] != each["parent"]:
+                children = self.generateTree(res1["name"],level)
+                if children:
+                    res1["children"] = children
+                
+            res1["level"] = level
             data.append(res1)
         
-        return res1
+        return data
             
 
-    
     #格式化树形
-    def getDataTree(self):
-        pass
-    
+    def getTreeData(self,tree):
+        for value in tree:
+            str = (value["level"] - 1 ) * ' ' * 3
+            print(str + value["name"] + "\n")
+            if "children" in value:
+                self.getTreeData(value["children"])
+
     def findData(self,condition):
         return self.collection.find(condition)
+
+    def toJson(self,list):
+        return json.dumps(list, indent=2,ensure_ascii=False)
+    
 
 if __name__ == "__main__":
     deal = dealSpider('./config.ini')
     #设置集合
     deal.setCollection("mc")
-    res = deal.generateTree("茗茶")
-    print(res)
+    res = deal.generateTree("茗茶",0)
+    #print(deal.toJson(res))
+    deal.getTreeData(res)
