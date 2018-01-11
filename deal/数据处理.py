@@ -27,19 +27,41 @@ class dealSpider(object):
             client = pymongo.MongoClient(host=self.getConfig("host"),port=int(self.getConfig("port")),\
                                             username=self.getConfig("user"),password=self.getConfig("pwd"))
             #指向指定的数据库
-            db = client[self.getConfig("dbname")]
+            self.db = client[self.getConfig("dbname")]
             #指定集合
-            self.collection = db.sku2
+            #self.collection = db[collection]
 
         except pymongo.errors.ConnectionFailure as e:
              print("Could not connect to server: %s" % e)
 
+    #指定集合
+    def setCollection(self,collection):
+        self.collection = self.db[collection]
+
+    #无线级分类
+    def generateTree(self,key):
+        data = []
+        res = self.findData({"parent":key})
+        for each in res:
+            res1 = {"name":each["top"]}
+            res1["children"] = self.generateTree(res1["name"])
+            
+            data.append(res1)
         
+        return res1
+            
+
     
-    def findData(self):
-        print(self.collection.find_one({"top":"进口食品"}))
+    #格式化树形
+    def getDataTree(self):
+        pass
+    
+    def findData(self,condition):
+        return self.collection.find(condition)
 
 if __name__ == "__main__":
     deal = dealSpider('./config.ini')
-    deal.findData()
-    
+    #设置集合
+    deal.setCollection("mc")
+    res = deal.generateTree("茗茶")
+    print(res)
