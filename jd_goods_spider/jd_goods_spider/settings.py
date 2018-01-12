@@ -90,9 +90,5 @@ ITEM_PIPELINES = {
 #HTTPCACHE_IGNORE_HTTP_CODES = []
 #HTTPCACHE_STORAGE = 'scrapy.extensions.httpcache.FilesystemCacheStorage'
 
-MONGODB_HOST = '127.0.0.1'
-MONGODB_PORT = 7788
-MONGODB_DBNAME = 'goods'
-MONGODB_USER = 'hanyu'
-MONGODB_PWD = '123456'
+
 
