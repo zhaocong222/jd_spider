@@ -46,7 +46,8 @@ class dealSpider(object):
                 user = self.getConfig("mysql","user"),
                 password = self.getConfig("mysql","pwd"),
                 db = self.getConfig("mysql","dbname"),
-                charset = self.getConfig("mysql","charset")
+                charset = self.getConfig("mysql","charset"),
+                cursorclass = pymysql.cursors.DictCursor
             )
             # 使用cursor()方法获取操作游标
             self.cur = self.link.cursor() 
@@ -80,6 +81,9 @@ class dealSpider(object):
         level += 1
 
         for each in self.findData({"parent":key}):
+            
+            print(each)
+            '''
             res1 = {"name":each["top"],"url":each["url"]}
             if each["top"] != each["parent"]:
                 children = self.generateTree(res1["name"],level)
@@ -88,7 +92,7 @@ class dealSpider(object):
                 
             res1["level"] = level
             data.append(res1)
-        
+            '''
         return data
             
 
@@ -111,6 +115,17 @@ class dealSpider(object):
             return self.cur.fetchall()
         except Exception as e:  
             raise e 
+
+    def exeDelete(self,sql):
+        try:
+            self.cur.execute(sql)
+             #提交  
+            self.link.commit()  
+
+        except Exception as e:  
+            #错误回滚  
+            self.link.rollback()  
+            print(e)   
 
     def insertBysql(self,sql):
         try:
@@ -162,7 +177,21 @@ class dealSpider(object):
                 if "children" in item:
                     self.dealInsert(item["children"],lastid)
 
+    #过滤数据(全部写入到mysql后执行，删除重复的分类)
+    #查询出 level > 3的记录，删除 对应的patentid并且删除本身
+    def filterData(self):
+        sql = 'select id,parent_id from yj_category where `level` > 3'
+        res = self.findBysql(sql)
+        for each in res:
+            sql = 'delete from yj_category where id in ('+str(each["parent_id"])+','+str(each["id"])+')'
+            self.exeDelete(sql)
+        
+        print("ok")
+            
 
+    #获取叶子节点的url
+    def getUrls(self):
+        pass
 
 '''
 ("ylct","饮料冲调","https://list.jd.com/list.html?cat=1320,1585"),
@@ -182,12 +211,13 @@ class dealSpider(object):
 if __name__ == "__main__":
     deal = dealSpider('./config.ini')
 
+    deal.filterData()
+
     #deal.initTop()
 
-    deal.setCollection("ldys")
-    res = deal.generateTree("冷饮冻食",1)
+    #res = deal.generateTree("粮油调味",1)
     #print(res)
-    deal.dealInsert(res,12)
+    #deal.dealInsert(res,12)
         
     
     
