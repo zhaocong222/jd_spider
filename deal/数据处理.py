@@ -4,6 +4,7 @@ import pymongo
 import configparser
 import json
 import pymysql
+import time
 
 class dealSpider(object):
 
@@ -106,22 +107,17 @@ class dealSpider(object):
 
     #显示品牌
     def showbrand(self):
-    
+        data = []
         for k,v,m in self.top:
             self.setCollection(k)
             res = self.findData({})
             for each in res:
                 for res1 in each["sku"]:
-                    print(res1)
-                
-                exit()
-                '''
-                for item in each["sku"]:
-                    if "品牌" in item:     
-                '''
-                #if '品牌' in each:
-                #    print(each['品牌'])
-                #    exit()
+                    if "品牌：" in res1:
+                        for res2 in res1["品牌："]:
+                            data.append(res2)
+                        
+        return data    
 
     #mongo
     def findData(self,condition):
@@ -164,6 +160,31 @@ class dealSpider(object):
                 sql = 'insert into yj_category(name,url,parent_id,level) \
                         values ("'+name+'","'+url+'",0,1)'
                 print(deal.insertBysql(sql))
+
+    #写入品牌
+    def insetBrand(self,data):
+
+        brand = set([])
+
+        for each in data:
+            src = ''
+            name = each
+            t = int(time.time())
+       
+            if isinstance(each,dict):
+                name = each["name"]
+                src = each["src"]
+            #防止重复写入
+            if name in brand:
+                continue
+            else:
+                sql = 'insert into yj_brand(brand_name,logo,creatime) \
+                        values ("'+name+'","'+src[2:]+'",'+str(t)+')'
+                print(deal.insertBysql(sql))
+                brand.add(name)
+          
+        print("ok")
+
 
     #转换json
     def toJson(self,list):
@@ -228,5 +249,9 @@ class dealSpider(object):
 
 if __name__ == "__main__":
     deal = dealSpider('./config.ini')
-    deal.showbrand()
-    
+    '''
+    #写入品牌
+    data = deal.showbrand()
+    #写入数据库
+    deal.insetBrand(data)
+    '''
