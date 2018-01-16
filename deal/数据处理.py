@@ -1,3 +1,5 @@
+#coding=utf-8 
+
 import pymongo
 import configparser
 import json
@@ -81,9 +83,7 @@ class dealSpider(object):
         level += 1
 
         for each in self.findData({"parent":key}):
-            
-            print(each)
-            '''
+
             res1 = {"name":each["top"],"url":each["url"]}
             if each["top"] != each["parent"]:
                 children = self.generateTree(res1["name"],level)
@@ -92,7 +92,7 @@ class dealSpider(object):
                 
             res1["level"] = level
             data.append(res1)
-            '''
+
         return data
             
 
@@ -104,9 +104,28 @@ class dealSpider(object):
             if "children" in value:
                 self.getTreeData(value["children"])
 
+    #显示品牌
+    def showbrand(self):
+    
+        for k,v,m in self.top:
+            self.setCollection(k)
+            res = self.findData({})
+            for each in res:
+                for res1 in each["sku"]:
+                    print(res1)
+                
+                exit()
+                '''
+                for item in each["sku"]:
+                    if "品牌" in item:     
+                '''
+                #if '品牌' in each:
+                #    print(each['品牌'])
+                #    exit()
+
     #mongo
     def findData(self,condition):
-        return self.collection.find(condition)
+       return self.collection.find(condition)
 
     #mysql
     def findBysql(self,sql):
@@ -187,7 +206,6 @@ class dealSpider(object):
             self.exeDelete(sql)
         
         print("ok")
-            
 
     #获取叶子节点的url
     def getUrls(self):
@@ -210,14 +228,5 @@ class dealSpider(object):
 
 if __name__ == "__main__":
     deal = dealSpider('./config.ini')
-
-    deal.filterData()
-
-    #deal.initTop()
-
-    #res = deal.generateTree("粮油调味",1)
-    #print(res)
-    #deal.dealInsert(res,12)
-        
-    
+    deal.showbrand()
     
