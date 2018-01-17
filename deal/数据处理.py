@@ -202,6 +202,15 @@ class dealSpider(object):
         res = deal.generateTree(name,1)
         print(self.toJson(res))
 
+    #查询叶子节点 写入json
+    def getLeaf(self):
+        sql = "select id,name,level,url from yj_category where level = 3"
+        res = self.findBysql(sql)
+        if res:
+            with open("./leaf.json","w") as f:
+                #json.dumps 转换为字符串
+                f.write(json.dumps(res,ensure_ascii=False))
+
     #处理数据
     def dealInsert(self,res,pid):
         if res:
@@ -255,3 +264,4 @@ if __name__ == "__main__":
     #写入数据库
     deal.insetBrand(data)
     '''
+    deal.getLeaf()

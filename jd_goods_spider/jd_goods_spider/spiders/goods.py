@@ -1,28 +1,51 @@
 # -*- coding: utf-8 -*-
 import scrapy
-
+import os
+import json
+from jd_goods_spider.items import JdGoodsSpiderItem
+from scrapy_splash import SplashRequest
 
 class GoodsSpider(scrapy.Spider):
     name = 'goods'
     allowed_domains = ['item.jd.com']
-    start_urls = ['http://item.jd.com/']
+    start_urls = ["https://list.jd.com/list.html?cat=12218,13591,13595&ev=1107_89465&sort=sort_rank_asc&trans=1&JL=3_%E5%88%86%E7%B1%BB_%E8%B4%A1%E4%B8%B8#J_crumbsBar"]
 
+    
     def start_requests(self):
-        urls = {
-            #"饮料冲调":"https://list.jd.com/list.html?cat=1320,1585",
-            #"茗茶":"https://list.jd.com/list.html?cat=1320,12202",
-            #"品牌礼券":"https://list.jd.com/list.html?cat=1320,2641",
-            #"地方特产":"https://list.jd.com/list.html?cat=1320,1581",
-            #"进口食品":"https://list.jd.com/list.html?cat=1320,5019",
-            #"粮油调味":"https://list.jd.com/list.html?cat=1320,1584",
-            #"休闲食品":"https://list.jd.com/list.html?cat=1320,1583",
-            #"中外名酒":"https://list.jd.com/list.html?cat=12259,12260",
-            #"新鲜水果":"https://list.jd.com/list.html?cat=12218,12221",
-            #"海鲜水产":"https://list.jd.com/list.html?cat=12218,12222",
-            #"精选肉类":"https://list.jd.com/list.html?cat=12218,13581",
-            #"冷饮冻食":"https://list.jd.com/list.html?cat=12218,13591",
-        }
-        pass
-
+        file = os.getcwd() + '/../deal/leaf.json'
+        res = []
+        with open(file,"r") as f:
+            res = json.loads(f.read())
+        
+        for each in res:
+            yield SplashRequest(url=each["url"],callback=self.parse,meta={"name":each["name"],"id":each["id"]})
+          
+    #采集商品
     def parse(self, response):
-        pass
+        
+        res = response.xpath("//li[@class='gl-item']")
+        for each in res:
+            item = JdGoodsSpiderItem()
+            img = each.xpath(".//div[@class='p-img']/a/img/@src").extract()
+            if not img:
+                img = each.xpath(".//div[@class='p-img']/a/img/@data-lazy-img").extract()[0].strip()
+            else:
+                img = img[0].strip()
+            url = each.xpath(".//div[@class='p-img']/a/@href").extract()[0].strip()
+            title = each.xpath(".//div[@class='p-name']/a/em/text()").extract()[0].strip()
+            price = each.xpath(".//strong[@class='J_price']/i/text()").extract()[0]
+            
+            item = {
+                "img" : img[2:],
+                "url" : url[2:],
+                "title":title,
+                "price":price,
+                "price_plus":''
+            }
+            
+            #会员价
+            price_plus = each.xpath(".//span[@class='price-plus-1']").extract()
+            if price_plus:
+                price_plus = price_plus[0].xpath("./em/text()").extract()
+                
+            print(price_plus)
