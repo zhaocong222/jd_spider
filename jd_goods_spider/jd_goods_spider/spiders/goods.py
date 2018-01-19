@@ -20,7 +20,6 @@ class GoodsSpider(scrapy.Spider):
         self.myheader["Referer"] = referer
         return self.myheader
          
-    
     def start_requests(self):
         file = os.getcwd() + '/../deal/leaf.json'
         res = []
@@ -29,12 +28,16 @@ class GoodsSpider(scrapy.Spider):
         
         for each in res:
             #yield scrapy.Request(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
-            #yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
-          
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
+
+
     #采集商品列表
     def parselist(self, response):
         
+        name = response.meta["name"]
+        _id  = response.meta["id"]
         res = response.xpath("//li[@class='gl-item']")
+        
         for each in res:
             
             img = each.xpath(".//div[@class='p-img']/a/img/@src").extract()
@@ -63,12 +66,16 @@ class GoodsSpider(scrapy.Spider):
             if price_plus:
                 data["price_plus"] = each.xpath(".//span[@class='price-plus-1']/em/text()").extract()[0][1:]
 
-            name = response.meta["name"]
-            _id  = response.meta["id"]
-
             yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url))
             #yield scrapy.Request(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data})
-          
+        
+        #获取下一页的page url
+        next_page = response.xpath("//a[@class='pn-next']/@href").extract()
+        if next_page:
+            url = 'https://list.jd.com'+next_page[0]
+            yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
+
+
     #采集商品详情
     def parseDetail(self, response):
         
@@ -109,6 +116,7 @@ class GoodsSpider(scrapy.Spider):
         adver_map = response.xpath("//div[@class='detail-content-item']//img/@data-lazyload").extract()
         adver_map = [i[2:] for i in adver_map]
 
+        #定义数据返回管道
         item = JdGoodsSpiderItem()
         item["goods_main_img"] = data["img"]
         item["goods_title"] = data["title"]
@@ -121,6 +129,8 @@ class GoodsSpider(scrapy.Spider):
         item["goods_adver"] = adver_map
         item["goods_info"] = package_info
         item["goods_package"] = package_info
+
+        yield item
 
 
 
