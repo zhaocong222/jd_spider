@@ -29,18 +29,22 @@ class GoodsSpider(scrapy.Spider):
                 img = each.xpath(".//div[@class='p-img']/a/img/@data-lazy-img").extract()[0].strip()
             else:
                 img = img[0].strip()
+                
             url = each.xpath(".//div[@class='p-img']/a/@href").extract()[0].strip()
             title = each.xpath(".//div[@class='p-name']/a/em/text()").extract()[0].strip()
-            price = each.xpath(".//strong[@class='J_price']/i/text()").extract()[0]
+            price = each.xpath(".//strong[@class='J_price']/i/text()").extract()
             
             data = {
                 "img" : img[2:],
                 "url" : "https://"+url[2:],
                 "title":title,
-                "price":price,
+                "price":'',
                 "price_plus":''
             }
-            
+
+            if price:
+                data["price"] = price[0]
+
             #会员价
             price_plus = each.xpath(".//span[@class='price-plus-1']").extract()
             if price_plus:
