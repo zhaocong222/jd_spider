@@ -2,11 +2,24 @@
 import scrapy
 import os
 import json
+import random
 from jd_goods_spider.items import JdGoodsSpiderItem
 from scrapy_splash import SplashRequest
+from scrapy.conf import settings
 
 class GoodsSpider(scrapy.Spider):
     name = 'goods'
+
+    myheader = {
+        'Accept-Language':'zh-CN,zh;q=0.9',
+        'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+    }
+
+    def getRandomHeader(self,referer = "https://www.jd.com/?cu=true&utm_source=baidu-pinzhuan&utm_medium=cpc&utm_campaign=t_288551095_baidupinzhuan&utm_term=0f3d30c8dba7459bb52f2eb5eba8ac7d_0_566711d8905d4aeaa03ad36c79c12e98"):
+        self.myheader["User-Agent"] = random.choice(settings['USER_AGENTS'])
+        self.myheader["Referer"] = referer
+        return self.myheader
+         
     
     def start_requests(self):
         file = os.getcwd() + '/../deal/leaf.json'
@@ -16,7 +29,7 @@ class GoodsSpider(scrapy.Spider):
         
         for each in res:
             #yield scrapy.Request(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
-            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
+            #yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
           
     #采集商品列表
     def parselist(self, response):
@@ -52,7 +65,8 @@ class GoodsSpider(scrapy.Spider):
 
             name = response.meta["name"]
             _id  = response.meta["id"]
-            yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data})
+
+            yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url))
             #yield scrapy.Request(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data})
           
     #采集商品详情
