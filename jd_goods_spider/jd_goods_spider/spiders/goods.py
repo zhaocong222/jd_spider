@@ -129,7 +129,8 @@ class GoodsSpider(scrapy.Spider):
         item["goods_adver"] = adver_map
         item["goods_info"] = package_info
         item["goods_package"] = package_info
-
+        item["goods_brand"] = goods_brand
+        
         yield item
 
 

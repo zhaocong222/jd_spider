@@ -32,3 +32,5 @@ class JdGoodsSpiderItem(scrapy.Item):
     goods_info = scrapy.Field()
     #商品规格包装
     goods_package = scrapy.Field()
+    #商品品牌
+    goods_brand = scrapy.Field()
