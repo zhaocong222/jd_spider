@@ -21,24 +21,19 @@ class GoodsSpider(scrapy.Spider):
         return self.myheader
          
     def start_requests(self):
-        yield scrapy.Request(url='https://www.baidu.com/',callback=self.parselist)
-
-        '''
+       
         file = os.getcwd() + '/../deal/leaf.json'
         res = []
         with open(file,"r") as f:
             res = json.loads(f.read())
         
         for each in res:
-            yield scrapy.Request(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
-            #yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
-        '''
+            #yield scrapy.Request(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
 
     #采集商品列表
     def parselist(self, response):
         
-        print(response.url)
-        '''
         name = response.meta["name"]
         _id  = response.meta["id"]
         res = response.xpath("//li[@class='gl-item']")
@@ -79,7 +74,7 @@ class GoodsSpider(scrapy.Spider):
         if next_page:
             url = 'https://list.jd.com'+next_page[0]
             yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
-        '''
+        
 
     #采集商品详情
     def parseDetail(self, response):
