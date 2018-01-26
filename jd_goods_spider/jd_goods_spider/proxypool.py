@@ -1,10 +1,10 @@
-#定时脚本维护代理池，每10秒执行一次 (检测如果有30个ip，不再填充)
+#定时脚本维护代理池，每10秒执行一次 (检测如果有200个ip，不再填充)
 from cache import CacheTool
 import requests
 import json
 
 l = CacheTool.llen("proxyip")
-if l > 30:
+if l > 200:
     exit(0)
 
 #填充ip
