@@ -63,8 +63,8 @@ SPIDER_MIDDLEWARES = {
 DOWNLOADER_MIDDLEWARES = {
     #'jd_goods_spider.middlewares.JdGoodsSpiderDownloaderMiddleware': 543,
     #'jd_goods_spider.middlewares.RandomUserAgentMiddleware': 543,
-    'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':123,
-    'jd_goods_spider.middlewares.ProxyIpMiddleware':125,  
+    #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':123,
+    #'jd_goods_spider.middlewares.ProxyIpMiddleware':125,  
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
     'scrapy.downloadermiddlewares.httpcompression.HttpCompressionMiddleware': 810,
