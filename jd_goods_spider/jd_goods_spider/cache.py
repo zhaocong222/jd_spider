@@ -1,5 +1,6 @@
 from redis import StrictRedis, ConnectionPool
 import hashlib
+import requests
 
 pool = ConnectionPool(host='localhost', port=6379, decode_responses=True)
 redis = StrictRedis(connection_pool=pool)
@@ -26,7 +27,36 @@ class CacheTool:
         return redis.smembers('url')
     
     @staticmethod
-    def 
+    def rpush(key,val):
+        return redis.rpush(key,val)
+
+    @staticmethod
+    def lpop(key):
+        return redis.lpop(key)
+
+    @staticmethod
+    def llen(key):
+        return redis.llen(key)
+
+'''
+#检测ip
+try:
+    requests.get('http://wenshu.court.gov.cn/', proxies={"http":"http://140.250.162.201:38272"})
+except:
+    print('connect failed')
+else:
+    print('success')
+'''
+
+'''
+#出队入队
+print(CacheTool.rpush("proxyip","213.324.12.22:324"))
+print(CacheTool.rpush("proxyip","213.324.12.22:325"))
+
+print(CacheTool.lpop("proxyip"))
+print(CacheTool.lpop("proxyip"))
+print(CacheTool.lpop("proxyip"))
+'''
 
 '''
 url = 'www.baidu.com'

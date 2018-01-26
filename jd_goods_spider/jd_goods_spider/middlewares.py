@@ -6,6 +6,8 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
+from jd_goods_spider.cache import CacheTool
+import requests
 
 class JdGoodsSpiderSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -100,3 +102,24 @@ class JdGoodsSpiderDownloaderMiddleware(object):
 
     def spider_opened(self, spider):
         spider.logger.info('Spider opened: %s' % spider.name)
+
+#代理ip
+class ProxyIpMiddleware(object):
+
+    def process_request(self, request, spider):
+        proxy = self.getProxyIp()
+        request.meta['proxy'] = proxy
+
+    #从队列中获取一个ip
+    def getProxyIp(self):
+        return CacheTool.lpop("proxyip")
+
+    #检测ip是否有效
+    def checkip(self,ip):
+        try:
+            requests.get('http://wenshu.court.gov.cn/', proxies={"http":ip})
+        except:
+            print("failed")
+        else:
+            return ip
+            
