@@ -24,7 +24,7 @@ class JdGoodsSpiderPipeline(object):
 
     def process_item(self, item, spider):
         data = dict(item)
-        print(data)
+        #print(data)
         #写入
-        #self.collection.insert(data)
+        self.collection.insert(data)
         return item
