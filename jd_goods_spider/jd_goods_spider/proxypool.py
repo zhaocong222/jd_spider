@@ -4,7 +4,7 @@ import requests
 import json
 
 l = CacheTool.llen("proxyip")
-if l < 30:
+if l > 30:
     exit(0)
 
 #填充ip
