@@ -37,8 +37,7 @@ class GoodsSpider(scrapy.Spider):
             res = json.loads(f.read())
         
         for each in res:
-            #yield scrapy.Request(url=each["url"],callback=self.parselist)
-            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]})
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader(),proxy=self.getProxyIp())
 
     #采集商品列表
     def parselist(self, response):

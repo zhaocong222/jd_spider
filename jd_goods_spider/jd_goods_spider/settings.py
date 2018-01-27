@@ -64,7 +64,7 @@ DOWNLOADER_MIDDLEWARES = {
     #'jd_goods_spider.middlewares.JdGoodsSpiderDownloaderMiddleware': 543,
     #'jd_goods_spider.middlewares.RandomUserAgentMiddleware': 543,
     #'scrapy.downloadermiddlewares.httpproxy.HttpProxyMiddleware':123,
-    'jd_goods_spider.middlewares.ProxyIpMiddleware':125,
+    #'jd_goods_spider.middlewares.ProxyIpMiddleware':125,
     'scrapy.downloadermiddlewares.useragent.UserAgentMiddleware': None,
     'scrapy_splash.SplashCookiesMiddleware': 723,
     'scrapy_splash.SplashMiddleware': 725,
