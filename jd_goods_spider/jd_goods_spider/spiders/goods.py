@@ -42,7 +42,9 @@ class GoodsSpider(scrapy.Spider):
 
     #采集商品列表
     def parselist(self, response):
-        
+
+        print(response.url)
+        '''
         name = response.meta["name"]
         _id  = response.meta["id"]
         res = response.xpath("//li[@class='gl-item']")
@@ -83,7 +85,7 @@ class GoodsSpider(scrapy.Spider):
         if next_page:
             url = 'https://list.jd.com'+next_page[0]
             #yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
-        
+        '''
 
     #采集商品详情
     def parseDetail(self, response):
