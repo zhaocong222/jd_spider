@@ -108,7 +108,9 @@ class ProxyIpMiddleware(object):
 
     def process_request(self, request, spider):
         proxy = self.getProxyIp()
-        request.meta["proxy"] = 'http://180.122.144.74:40476'
+        print(proxy)
+        print(type(proxy))
+        request.meta["proxy"] = proxy
 
     #从队列中获取一个ip
     def getProxyIp(self):
