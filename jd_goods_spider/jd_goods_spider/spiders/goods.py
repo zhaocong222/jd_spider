@@ -6,6 +6,7 @@ import random
 from jd_goods_spider.items import JdGoodsSpiderItem
 from scrapy_splash import SplashRequest
 from scrapy.conf import settings
+from jd_goods_spider.cache import CacheTool
 
 class GoodsSpider(scrapy.Spider):
     name = 'goods'
@@ -14,6 +15,14 @@ class GoodsSpider(scrapy.Spider):
         'Accept-Language':'zh-CN,zh;q=0.9',
         'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
     }
+
+    #从队列中获取一个ip
+    def getProxyIp(self):
+        return CacheTool.lpop("proxyip")
+
+    def getargs(self):
+        ip = self.getProxyIp()
+        return {'proxy':ip}
 
     def getRandomHeader(self,referer = "https://www.jd.com/?cu=true&utm_source=baidu-pinzhuan&utm_medium=cpc&utm_campaign=t_288551095_baidupinzhuan&utm_term=0f3d30c8dba7459bb52f2eb5eba8ac7d_0_566711d8905d4aeaa03ad36c79c12e98"):
         self.myheader["User-Agent"] = random.choice(settings['USER_AGENTS'])
@@ -28,7 +37,7 @@ class GoodsSpider(scrapy.Spider):
             res = json.loads(f.read())
         
         for each in res:
-            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader(),args=self.getargs())
 
     #采集商品列表
     def parselist(self, response):
@@ -65,14 +74,14 @@ class GoodsSpider(scrapy.Spider):
             if price_plus:
                 data["price_plus"] = each.xpath(".//span[@class='price-plus-1']/em/text()").extract()[0][1:]
 
-            yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url))
+            yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url),args=self.getargs())
             #yield scrapy.Request(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data})
         
         #获取下一页的page url
         next_page = response.xpath("//a[@class='pn-next']/@href").extract()
         if next_page:
             url = 'https://list.jd.com'+next_page[0]
-            yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
+            yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url),args=self.getargs())
         
 
     #采集商品详情
