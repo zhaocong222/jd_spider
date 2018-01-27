@@ -37,7 +37,8 @@ class GoodsSpider(scrapy.Spider):
             res = json.loads(f.read())
         
         for each in res:
-            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader(),proxy=self.getProxyIp())
+            myargs={'wait': 2.5, 'proxy':self.getProxyIp(),}
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader(),args=myargs)
 
     #采集商品列表
     def parselist(self, response):
