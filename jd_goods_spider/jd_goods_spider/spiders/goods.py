@@ -37,14 +37,12 @@ class GoodsSpider(scrapy.Spider):
             res = json.loads(f.read())
         
         for each in res:
-            myargs={'wait': 2.5, 'proxy':self.getProxyIp(),'js_source': 'document.body',}
-            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader(),args=myargs)
+            yield SplashRequest(url=each["url"],callback=self.parselist,meta={"name":each["name"],"id":each["id"]},headers=self.getRandomHeader())
 
     #采集商品列表
     def parselist(self, response):
-
         print(response.url)
-        '''
+       
         name = response.meta["name"]
         _id  = response.meta["id"]
         res = response.xpath("//li[@class='gl-item']")
@@ -77,15 +75,15 @@ class GoodsSpider(scrapy.Spider):
             if price_plus:
                 data["price_plus"] = each.xpath(".//span[@class='price-plus-1']/em/text()").extract()[0][1:]
 
-            #yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url))
+            yield SplashRequest(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data},headers=self.getRandomHeader(response.url))
             #yield scrapy.Request(url=data["url"],callback=self.parseDetail,meta={"name":name,"id":_id,"goods":data})
         
         #获取下一页的page url
         next_page = response.xpath("//a[@class='pn-next']/@href").extract()
         if next_page:
             url = 'https://list.jd.com'+next_page[0]
-            #yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
-        '''
+            yield SplashRequest(url=url,callback=self.parselist,meta={"name":name,"id":_id},headers=self.getRandomHeader(response.url))
+        
 
     #采集商品详情
     def parseDetail(self, response):
